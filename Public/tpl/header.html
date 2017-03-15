@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>后台管理系统</title>
+    <!-- Morris Chart Styles-->
+    <link href="/Public/assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
+    <!-- Bootstrap Styles-->
+    <link href="/Public/assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FontAwesome Styles-->
+    <link href="/Public/assets/css/font-awesome.css" rel="stylesheet" />
+
+    <!-- Custom Styles-->
+    <link href="/Public/assets/css/custom-styles.css" rel="stylesheet" />
+    <!-- Google Fonts-->
+
+    <link rel="stylesheet" href="/Public/assets/css/common-style.css">
+    <!-- jQuery Js -->
+    <script src="/Public/assets/js/lodash.min.js"></script>
+    <script src="/Public/assets/js/jquery-1.10.2.js"></script>
+    <script src="/Public/assets/js/vue.js"></script>
+    <script src="/Public/assets/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/Public/assets/datepicker/daterangepicker.css">
+    <script src="/Public/assets/datepicker/moment.min.js"></script>
+    <script src="/Public/assets/datepicker/daterangepicker.js"></script>
+
+    <script>
+        $(function(){
+            $.ajaxSetup({   //设置全局信息
+                beforeSend:function(xhr) {
+                    xhr.setRequestHeader("Authorization","{$Think.session.ucenter.csrf_key}");
+                }
+            });
+
+            var datePickerOptions = {
+                "singleDatePicker": true,
+                "showDropdowns": true,
+                "showWeekNumbers": true,
+                "showISOWeekNumbers": true,
+                "timePicker": true,
+                "timePicker24Hour": true,
+                "timePickerSeconds": true,
+                "autoApply": true,
+                "dateLimit": {
+                    "days": 7
+                },
+
+                "locale": {
+                    "direction": "ltr",
+                    "format": "YYYY-MM-DD HH:mm:ss",
+                    "separator": " - ",
+                    "applyLabel": "确定",
+                    "cancelLabel": "取消",
+                    "fromLabel": "From",
+                    "toLabel": "To",
+                    "customRangeLabel": "Custom",
+                    "daysOfWeek": [ //
+                        "日",
+                        "一",
+                        "二",
+                        "三",
+                        "四",
+                        "五",
+                        "六"
+                    ],
+                    "monthNames": [
+                        "一月",
+                        "二月",
+                        "三月",
+                        "四月",
+                        "五月",
+                        "六月",
+                        "七月",
+                        "八月",
+                        "九月",
+                        "十月",
+                        "十一月",
+                        "十二月"
+                    ],
+                    "firstDay": 1
+                },
+                "alwaysShowCalendars": true,
+            };
+
+            $('.begin_time').daterangepicker(datePickerOptions, function(start, end, label) {
+            });
+            $('.end_time').daterangepicker(datePickerOptions, function(start, end, label) {
+            });
+
+        });
+
+    </script>
+    <style>
+        .form-item {
+            margin-bottom:10px;
+        }
+        .padding-item{
+            padding-bottom:5px;
+        }
+        /*.nav > li > a{*/
+            /*padding: 10px 15px;*/
+        /*}*/
+        .floatleft {
+            float: left;
+        }
+    </style>
+
+</head>
+
+<body>
+<div id="wrapper">
+
+    <div class="row" style="background-color: #1cc09f;">
+        <div class="col-lg-2">
+
+        </div>
+        <div class="col-lg-10 text-right" style="padding: 12px 10px;">
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown floatleft">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-messages">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <strong>John Doe</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>Today</em>
+                                    </span>
+                                </div>
+                                <div>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <strong>John Smith</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>Yesterday</em>
+                                    </span>
+                                </div>
+                                <div>Lorem Ipsum has been the industry's standard dummy text ever since an kwilnw...</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <strong>John Smith</strong>
+                                    <span class="pull-right text-muted">
+                                        <em>Yesterday</em>
+                                    </span>
+                                </div>
+                                <div>Lorem Ipsum has been the industry's standard dummy text ever since the...</div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>Read All Messages</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-messages -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown floatleft">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-tasks">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 1</strong>
+                                        <span class="pull-right text-muted">60% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
+                                            <span class="sr-only">60% Complete (success)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 2</strong>
+                                        <span class="pull-right text-muted">28% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100" style="width: 28%">
+                                            <span class="sr-only">28% Complete</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 3</strong>
+                                        <span class="pull-right text-muted">60% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
+                                            <span class="sr-only">60% Complete (warning)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <p>
+                                        <strong>Task 4</strong>
+                                        <span class="pull-right text-muted">85% Complete</span>
+                                    </p>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width: 85%">
+                                            <span class="sr-only">85% Complete (danger)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>See All Tasks</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-tasks -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown floatleft">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> New Comment
+                                    <span class="pull-right text-muted small">4 min</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
+                                    <span class="pull-right text-muted small">12 min</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-envelope fa-fw"></i> Message Sent
+                                    <span class="pull-right text-muted small">4 min</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-tasks fa-fw"></i> New Task
+                                    <span class="pull-right text-muted small">4 min</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-upload fa-fw"></i> Server Rebooted
+                                    <span class="pull-right text-muted small">4 min</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>See All Alerts</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown floatleft">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="/Ucenter/index/nmMain"><i class="fa fa-user fa-fw"></i> {$Think.session.ucenter.name}</a>
+                        </li>
+                        <li><a href="/Ucenter/index/nmMain?cate=pwd"><i class="fa fa-gear fa-fw"></i> 修改用户密码</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="/logout.html"><i class="fa fa-sign-out fa-fw"></i>退出系统</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-2">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu" style="background: #283643;">
+                    <foreach name="menus" item="item" key="k">
+                        <li <php>if($module_name == strtolower($item[0]['key'])) echo 'class="active"';</php> >
+                        <a href="#">
+                            <i class="fa fa-sitemap"></i>{$k}<span class="fa arrow"></span>
+                        </a>
+
+                        <ul class="nav nav-second-level">
+                            <volist name="item" id="subitem">
+                                <li <php>if($cur_href == strtolower($subitem['href'])) echo 'class="active-menu"';</php>>
+                                <a href="/{$subitem.alias}">{$subitem.subtitle}</a>
+                                </li>
+                            </volist>
+                        </ul>
+                        </li>
+                    </foreach>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-10" style="padding: 0px;">
+
+
+            <div id="page-wrapper">
+                <div id="page-inner">
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb">
+                                <li><a href="#">{$nav.gtitle}</a></li>
+                                <li><a href="#">{$nav.ctitle}</a></li>
+                                <li class="active">{$nav.ftitle}</li>
+                            </ol>
+                        </div>
+                    </div>
+
+
+    <!--/. NAV TOP  -->
+
+    <!-- /. NAV SIDE  -->
+

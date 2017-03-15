@@ -1,0 +1,231 @@
+<include file="./Public/tpl/header.html"/>
+
+<link rel="stylesheet" href="/Public/assets/js/treeview/jquery.treeview.css">
+<script src="/Public/assets/js/treeview/demo/jquery.cookie.js"></script>
+<script src="/Public/assets/js/treeview/jquery.treeview.js"></script>
+<script src="/Public/assets/js/treeview/demo/demo.js"></script>
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#myModal">添加角色</button>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th width="60">ID</th>
+                            <th width="120">标题</th>
+                            <th width="60">状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <volist name="items" id="item">
+                            <tr>
+                                <td>{$item.id}</td>
+                                <td>{$item.title}</td>
+                                <td>
+                                    <if condition="$item.state == 1">
+                                        <span class="text-success">正常</span>
+                                    <else />
+                                        <span class="text-danger">禁用</span>
+                                    </if>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-default btn-sm" type="button" data-class="changeRole" data-id="{$item.id}" data-state="{$item.state}">
+                                            <if condition="$item.state == 1">
+                                                禁用
+                                            <else />
+                                                启用
+                                            </if>
+                                        </button>
+                                        <button class="btn btn-default btn-sm" type="button" data-class="setAccess" data-rid="{$item.id}" data-toggle="modal" data-target="#nodeModal" >配置</button>
+                                        <button class="btn btn-default btn-sm btn-danger" type="button" data-class="delRole" data-id="{$item.id}">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </volist>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 新增角色 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">新增角色</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-responsive table-bordered">
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" id="role_name" placeholder="请输入角色名">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" id="addRole">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 结束新增角色 -->
+
+<!-- 配置角色 -->
+<div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="nodeModalLabel">配置角色权限</h4>
+            </div>
+            <div class="modal-body">
+
+                <form action="" id="NForm">
+                    <input type="hidden" id="Rid" name="role_id">
+
+                    <ul id="black" class="treeview-black">
+                        <volist name="nodes.group" id="group">
+                            <li>
+                                <span>
+                                    <input type="checkbox" data-id="{$group.id}" data-class="select_node" data-cate="group" data-gid="{$group.id}" name="nodes[]" value="{$group.id}" <php>if($map[$group['id']]){ echo 'checked'; }</php> >
+                                    {$group.title}
+                                </span>
+                                <ul>
+                                    <php>$_controllers = $nodes['controller'][$group['id']];</php>
+                                    <volist name="_controllers" id="controller">
+                                        <li>
+                                            <span>
+                                                <input type="checkbox" data-id="{$controller.id}" name="nodes[]" data-class="select_node" data-cate="controller" data-gid="{$group.id}" data-cid="{$controller.id}" value="{$controller.id}" <php>if($map[$controller['id']]){ echo 'checked'; }</php>>
+                                                {$controller.title}-控制器
+                                            </span>
+
+                                            <ul>
+                                                <php>$_functions = $nodes['function'][$controller['id']];</php>
+                                                <volist name="_functions" id="function">
+                                                    <li>
+                                                        <div>
+                                                            <input type="checkbox" data-id="{$function.id}" name="nodes[]" data-class="select_node" data-cate="function" data-gid="{$group.id}" data-cid="{$controller.id}" data-fid="{$function.id}" value="{$function.id}" <php>if($map[$function['id']]){ echo 'checked'; }</php> >
+                                                            {$function.title}
+                                                        </div>
+                                                    </li>
+                                                </volist>
+                                            </ul>
+                                        </li>
+                                    </volist>
+                                </ul>
+
+                            </li>
+                        </volist>
+                    </ul>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" id="saveAccess">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 结束配置角色 -->
+
+<script>
+    $('button[data-class="setAccess"]').click(function(){
+        var id = $(this).attr('data-rid');
+        $.post('__URL__/ajaxFindAccess',{id:id},function(callback){
+            var items = callback.data;
+            var length = items.length;
+            $('input[type="checkbox"]').prop('checked',false);
+            for(var i=0;i<length;i++) {
+                $('input[data-id="'+items[i]+'"]').prop('checked',true);
+            }
+        },'json');
+        $('#Rid').val(id);
+    });
+
+    $('#saveAccess').click(function(){
+        var obj = $('#NForm');
+        $.post('__URL__/ajaxSaveAccess',obj.serialize(),function(callback){
+            if(callback.code == 2000) {
+                window.location.reload();
+            } else {
+                alert(callback.msg);
+            }
+        },'json');
+    });
+
+    $('button[data-class="changeRole"]').click(function(){
+        var id = $(this).attr('data-id');
+        var state = $(this).attr('data-state');
+        $.post('__URL__/ajaxChangeRole',{id:id,state:state},function(callback){
+            if(callback.code == 2000) {
+                window.location.reload();
+            } else {
+                alert(callback.msg);
+            }
+        },'json');
+    });
+
+    $('button[data-class="delRole"]').click(function(){
+        var id = $(this).attr('data-id');
+        if(confirm('确定要删除角色吗？')) {
+            $.post('__URL__/ajaxDelRole',{id:id},function(callback){
+                if(callback.code == 2000) {
+                    window.location.reload();
+                } else {
+                    alert(callback.msg);
+                }
+            },'json');
+        }
+    });
+
+    $('#addRole').click(function(){
+        var roleName = $('#role_name').val();
+        $.post('__URL__/ajaxAddRole',{title:roleName},function(callback){
+            if(callback.code == 2000) {
+                window.location.reload();
+            } else {
+                alert(callback.msg);
+            }
+        },'json');
+    });
+
+    $('input[data-class="select_node"]').click(function(){
+        var obj = $(this);
+        var cate = obj.attr('data-cate');
+        if(cate == 'group') {
+            var gid = $(this).attr('data-gid');
+            if(obj.is(':checked')) {
+                $('input[data-gid="'+gid+'"]').prop('checked',true);
+            } else {
+                $('input[data-gid="'+gid+'"]').prop('checked',false);
+            }
+        } else if(cate == 'controller') {
+            var cid = $(this).attr('data-cid');
+            var gid = $(this).attr('data-gid');
+            if(obj.is(':checked')) {
+                $('input[data-cid="'+cid+'"]').prop('checked',true);
+            } else {
+                $('input[data-cid="'+cid+'"]').prop('checked',false);
+            }
+        }
+    });
+
+</script>
+
+<include file="./Public/tpl/footer.html"/>
