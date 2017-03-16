@@ -30,7 +30,7 @@ class RbacModel extends Model
      * @return mixed
      */
     public function findAllGroups() {
-        return M('RbacGroup')->order('id ASC')->select();
+        return M('RbacGroup')->order('sort ASC')->select();
     }
 
     /**
@@ -175,4 +175,5 @@ class RbacModel extends Model
                 ->join("{$prex}rbac_node AS rn ON {$prex}rbac_access.node_id = rn.id",'left')
                 ->select();
     }
+
 }

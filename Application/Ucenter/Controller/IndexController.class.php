@@ -46,8 +46,13 @@ class IndexController extends Controller {
                     'csrf_key' => md5($time . '_' . C('csrf_key')),
                     'salt' => $user['salt'],
                     'password' => $user['password'],
+                    'role_title' => $user['role_title'],
+                    'email' => $user['email'],
+                    'last_login_time' => $user['last_login_time'],
+                    'last_login_ip' => $user['last_login_ip'],
+                    'mobile' => $user['mobile'],
                 );
-
+                $model->updateUserLogin($user['id']);
                 $model = new RbacModel();
                 $_nodes = $model->findAllAccessByRoleId($ucenter['role_id']);
                 $nodes = array();
@@ -87,14 +92,38 @@ class IndexController extends Controller {
         $ucenter = session('ucenter');
         $cate = I('get.cate','default');
         $model = new UcenterModel();
-        $params = array(
-            'uid' => $ucenter['id'],
-            'pagesize' => 20,
-        );
-        $logs = $model->findAllLog($params);
-        $this->assign('logs',$logs);
-        $this->assign('cate',$cate);
-        $this->display();
+        if($cate == 'info' && IS_POST) {
+            $params = array(
+                'email' => I('post.email','','trim,strtolower'),
+                'mobile' => I('post.mobile','','trim'),
+            );
+
+            if($model->updateUcenterByUid($ucenter['id'],$params)) {
+                $ucenter['email'] = $params['email'];
+                $ucenter['mobile'] = $params['mobile'];
+                session('ucenter',$ucenter);
+                $this->ajaxReturn(array(
+                    'code' => 2000,
+                    'data' => null,
+                    'msg'  => '更新用户信息～',
+                ));
+            } else {
+                $this->ajaxReturn(array(
+                    'code' => 50100,
+                    'data' => null,
+                    'msg'  => '信息更新失败～',
+                ));
+            }
+        } else {
+            $params = array(
+                'uid' => $ucenter['id'],
+                'pagesize' => 20,
+            );
+            $logs = $model->findAllLog($params);
+            $this->assign('logs',$logs);
+            $this->assign('cate',$cate);
+            $this->display();
+        }
     }
 
     /**

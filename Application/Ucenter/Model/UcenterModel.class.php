@@ -52,7 +52,12 @@ class UcenterModel extends Model
             'username' => $username,
         );
 
-        return M('AdminUser')->where($map)->find();
+        $prex = C('DB_PREFIX');
+        return  M('AdminUser')
+                ->field("{$prex}admin_user.*,rr.title AS role_title")
+                ->join("{$prex}rbac_role AS rr ON rr.id = {$prex}admin_user.role_id")
+                ->where($map)
+                ->find();
     }
 
     /**
@@ -69,6 +74,24 @@ class UcenterModel extends Model
         );
 
         return $this->where($map)->save($data);
+    }
+
+    /**
+     * @alias   修改用户信息～
+     * @author  saive@cneli.com
+     * @date    2017-03-14
+     * @param $uid
+     * @param $params
+     * @return bool
+     */
+    public function updateUcenterByUid($uid,$params) {
+        $map = array(
+            'id' => $uid,
+        );
+
+        $params['update_time'] = time();
+
+        return $this->where($map)->save($params);
     }
 
     /**
@@ -134,6 +157,23 @@ class UcenterModel extends Model
         return $res;
     }
 
+    /**
+     * @alias   更新用户登录信息
+     * @author  saive@cneli.com
+     * @date    2017-03-16
+     * @param $uid
+     * @return bool
+     */
+    public function updateUserLogin($uid) {
+        $data = array(
+            'last_login_time' => time(),
+            'last_login_ip' => get_client_ip(),
+        );
+        $map = array(
+            'id' => $uid
+        );
 
+        return $this->where($map)->save($data);
+    }
 
 }

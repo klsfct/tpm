@@ -6,18 +6,18 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <ul class="nav nav-tabs">
-                    <li <if condition="$cate != 'pwd'">class="active"</if> ><a href="#home" data-toggle="tab">日志记录</a>
+                    <li <if condition="$cate == 'default'">class="active"</if> ><a href="#home" data-toggle="tab">日志记录</a>
                     </li>
-                    <li class=""><a href="#profile" data-toggle="tab">基础信息</a>
+                    <li <if condition="$cate eq 'info'">class="active"</if> ><a href="#profile" data-toggle="tab">基础信息</a>
                     </li>
                     <li <if condition="$cate eq 'pwd'">class="active"</if> ><a href="#messages" data-toggle="tab">修改密码</a>
                     </li>
-                    <li class=""><a href="#settings" data-toggle="tab">便利贴</a>
-                    </li>
+                    <!--<li class=""><a href="#settings" data-toggle="tab">便利贴</a>-->
+                    <!--</li>-->
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane fade <if condition="$cate neq 'pwd'">active in</if>" id="home">
+                    <div class="tab-pane fade <if condition="$cate eq 'default'">active in</if>" id="home">
                         <p>
                         <table class="table table-bordered table-responsive">
                             <thead>
@@ -28,7 +28,9 @@
                             <tbody>
                             <volist name="logs.items" id="item">
                                 <tr>
-                                    <td>{$item.desc}</td>
+                                    <td>
+                                        <div style="max-width:1200px;word-wrap:break-word ;">{$item.desc}</div>
+                                    </td>
                                     <td>{$item.create_time|date="Y-m-d H:i:s",###}</td>
                                     <td>{$item.ip}</td>
                                 </tr>
@@ -44,10 +46,54 @@
                         </table>
                         </p>
                     </div>
-                    <div class="tab-pane fade" id="profile">
-                        <p>
-                            用户基础信息部分～
-                        </p>
+                    <div class="tab-pane fade <if condition="$cate eq 'info'">active in</if>" id="profile">
+                        <div class="col-md-6">
+                            <form action="__URL__/nmMain?cate=info" method="post">
+                                <table class="table table-bordered table-responsive" style="margin-top: 10px;">
+                                    <tr>
+                                        <td width="120">登录名称：</td>
+                                        <td>
+                                            {$Think.session.ucenter.username}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>名称：</td>
+                                        <td>
+                                            {$Think.session.ucenter.name}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>邮箱：</td>
+                                        <td>
+                                            <input type="text" class="form-control" name="email" value="{$Think.session.ucenter.email}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>电话号码：</td>
+                                        <td>
+                                            <input type="text" class="form-control" name="mobile" value="{$Think.session.ucenter.mobile}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>最后登录时间：</td>
+                                        <td>
+                                            {$Think.session.ucenter.last_login_time|date="Y-m-d H:i:s",###}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>最后登录IP：</td>
+                                        <td>
+                                            {$Think.session.ucenter.last_login_ip}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <button type="button" data-id="updateInfo" class="btn btn-sm btn-default">更新资料</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
                     </div>
                     <div class="tab-pane fade <if condition="$cate eq 'pwd'">active in</if> " id="messages">
                         <p>
@@ -121,6 +167,18 @@
                     }
                 },'json');
             }
+        });
+
+        $('button[data-id="updateInfo"]').click(function(){
+            var obj = $(this).parents('form');
+            $.post(obj.attr('action'),obj.serialize(),function(callback){
+                if(callback.code == 2000) {
+                    window.location.href = obj.attr('action');
+                } else {
+                    alert(callback.msg);
+                }
+            },'json');
+
         });
     });
 </script>

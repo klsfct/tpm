@@ -154,7 +154,7 @@ abstract class Controller {
             $res =  M('RbacMenu')
                 ->field("{$prex}rbac_menu.id,{$prex}rbac_menu.node_unique_key,{$prex}rbac_menu.sort,{$prex}rbac_menu.gid,{$prex}rbac_menu.title AS subtitle,rg.title,rg.key,{$prex}rbac_menu.href,{$prex}rbac_menu.alias")
                 ->join("{$prex}rbac_group AS rg ON rg.id={$prex}rbac_menu.gid",'left')
-                ->order('sort ASC')
+                ->order("rg.sort ASC,{$prex}rbac_menu.sort ASC")
                 ->select();
             if(empty($res)) {
                 $sql = "
