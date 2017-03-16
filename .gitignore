@@ -1,3 +1,8 @@
 .idea
 Application/Runtime/*
 Application/Common/Conf/database.php
+
+Application/Active
+Application/Notice
+
+
