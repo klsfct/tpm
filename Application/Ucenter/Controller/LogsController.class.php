@@ -26,7 +26,7 @@ class LogsController extends Controller
 
         $model = new UcenterModel();
         $params = array(
-            'pagesize' => 20,
+            'pagesize' => $this->pagesize,
         );
         $logs = $model->findAllLog($params);
         $this->assign('logs',$logs);

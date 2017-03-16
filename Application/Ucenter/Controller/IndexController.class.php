@@ -117,7 +117,7 @@ class IndexController extends Controller {
         } else {
             $params = array(
                 'uid' => $ucenter['id'],
-                'pagesize' => 20,
+                'pagesize' => $this->pagesize,
             );
             $logs = $model->findAllLog($params);
             $this->assign('logs',$logs);

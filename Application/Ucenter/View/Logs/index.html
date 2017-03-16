@@ -16,7 +16,7 @@
                                     <th>控制器</th>
                                     <th>操作名</th>
                                     <th>用户</th>
-                                    <th>内容</th>
+                                    <th width="1000">内容</th>
                                     <th>时间</th>
                                 </tr>
                                 </thead>
@@ -28,7 +28,9 @@
                                         <td>{$item.controller}</td>
                                         <td>{$item.function}</td>
                                         <td>{$item.name}</td>
-                                        <td>{$item.desc}</td>
+                                        <td>
+                                            <div style="max-width:1000px;word-wrap:break-word ;"">{$item.desc}</div>
+                                        </td>
                                         <td>{$item.create_time|date="Y-m-d H:i:s",###}</td>
                                     </tr>
                                 </volist>

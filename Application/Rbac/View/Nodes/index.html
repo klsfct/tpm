@@ -1,10 +1,13 @@
 <include file="./Public/tpl/header.html" />
 
         <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        角色权限相关表
+                        <a href="__URL__/index?level=999" class="btn btn-default btn-sm <if condition="$level eq 999">active</if> ">全部</a>
+                        <a href="__URL__/index?level=1" class="btn btn-default btn-sm <if condition="$level eq 1">active</if> ">分组</a>
+                        <a href="__URL__/index?level=2" class="btn btn-default btn-sm <if condition="$level eq 2">active</if> ">控制器</a>
+                        <a href="__URL__/index?level=3" class="btn btn-default btn-sm <if condition="$level eq 3">active</if> ">方法</a>
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive">
@@ -14,24 +17,57 @@
                                     <th>标题</th>
                                     <th>KEY</th>
                                     <th>等级</th>
-                                    <th>状态</th>
+                                    <th width="100">状态</th>
+                                    <th width="200">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <volist name="items" id="item">
                                     <tr>
-                                        <td>{$item.title}</td>
+                                        <td>
+                                            {$item.title}
+                                            <input type="text" style="display: none;" data-oldvalue="{$item.title}" value="{$item.title}" class="form-control" data-id="{$item.id}" data-cate="title">
+                                        </td>
                                         <td>{$item.key}</td>
-                                        <td>{$item.level}</td>
-                                        <td>{$item.state}</td>
+                                        <td>
+                                            <switch name="item.level">
+                                                <case value="0" break="1">
+                                                    <span class="label label-info">项目</span>
+                                                </case>
+                                                <case value="1" break="1">
+                                                    <span class="label label-primary">分组</span>
+                                                </case>
+                                                <case value="2" break="1">
+                                                    <span class="label label-success">控制器</span>
+                                                </case>
+                                                <case value="3" break="1">
+                                                    <span class="label label-warning">方法</span>
+                                                </case>
+                                            </switch>
+                                        </td>
+                                        <td>
+                                            <switch name="item.state">
+                                                <case value="0" break="1">
+                                                    <span class="label label-danger">禁用</span>
+                                                </case>
+                                                <case value="1" break="1">
+                                                    <span class="label label-success">正常</span>
+                                                </case>
+                                            </switch>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-default btn-sm" type="button" data-cate="editNode" data-id="{$item.id}">修改</button>
+
+                                            <button class="btn btn-default btn-sm btn-primary" style="display: none;" type="button" data-cate="saveNode" data-id="{$item.id}">保存</button>
+                                            <button class="btn btn-default btn-sm btn-danger" style="display: none;" type="button" data-cate="cancelNode" data-id="{$item.id}">取消</button>
+                                        </td>
                                     </tr>
                                 </volist>
                                 </tbody>
                             </table>
 
                             <div>
-                                <button class="btn btn-default btn-sm btn-info" type="button" @click="saveMenus()">保存导航</button>
-                                <button class="btn btn-default btn-sm btn-primary" type="button" @click="installdiff()">只安装缺失表</button>
+                                {$page}
                             </div>
 
                         </div>
@@ -46,30 +82,47 @@
     $(function(){
 
 
-        var nodes = new Vue({
-            el : '#page-wrapper',
-            data : {
-                menus : {$menusObj}
-            },
-            methods: {
-                saveMenus : function() {
-                    var _self = this;
-                    console.log(_self.menus);
-                    $.post('/rbac-savemenus',{items:_self.menus},function(callback) {
 
-                        console.log(callback);
-                        if(callback.code == 2000) {
-                            window.location.reload();
-                        } else {
-                            alert(callback.msg);
-                        }
-                    },'json');
-                }
-            }
+        $('button[data-cate="editNode"]').click(function(){
+            var obj = $(this);
+            var id = obj.attr('data-id');
+            var inputObj = $('input[data-cate="title"][data-id="'+id+'"]');
+            var saveObj = $('button[data-cate="saveNode"][data-id="'+id+'"]');
+            var cancelObj = $('button[data-cate="cancelNode"][data-id="'+id+'"]');
+            inputObj.show();
+            obj.hide();
+            saveObj.show();
+            cancelObj.show();
         });
 
-        console.log({$menusObj});
-//        console.log(nodes.menus);
+        $('button[data-cate="cancelNode"]').click(function(){
+            var obj = $(this);
+            var id = obj.attr('data-id');
+            var inputObj = $('input[data-cate="title"][data-id="'+id+'"]');
+            var saveObj = $('button[data-cate="saveNode"][data-id="'+id+'"]');
+            var cancelObj = $('button[data-cate="cancelNode"][data-id="'+id+'"]');
+            var editObj = $('button[data-cate="editNode"][data-id="'+id+'"]');
+            inputObj.hide();
+            saveObj.hide();
+            cancelObj.hide();
+            editObj.show();
+        });
+
+        $('button[data-cate="saveNode"]').click(function(){
+            var obj = $(this);
+            var id = obj.attr('data-id');
+            var inputObj = $('input[data-cate="title"][data-id="'+id+'"]');
+            var val = inputObj.val();
+            var oldval = inputObj.attr('data-oldvalue');
+
+            $.post('__URL__/ajaxNode',{id:id,title:val,oldtitle:oldval},function(callback){
+                if(callback.code == 2000){
+                    window.location.reload();
+                } else {
+                    alert(callback.msg);
+                }
+            },'json');
+        });
     });
 </script>
 <include file="./Public/tpl/footer.html" />

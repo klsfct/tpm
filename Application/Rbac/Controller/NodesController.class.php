@@ -25,13 +25,53 @@ class NodesController extends Controller
      */
     public function index() {
         $model = new RbacModel();
-        $_nodes = $model->findAllNodes();
-        $nodes = array();
-        foreach($_nodes as $_node) {
-            $nodes[$_node['id']] = $_node;
+        $params = array(
+            'level' => I('get.level',999,'intval'),
+            'pagesize' => $this->pagesize,
+        );
+        $res = $model->findAllNodes($params);
+
+        $this->assign('level',$params['level']);
+        $this->assign('page',$res['show']);
+        $this->assign('items',$res['items']);
+        $this->display();
+    }
+
+    /**
+     * @alias   修改节点信息
+     * @author  saive@cneli.com
+     * @date    2017-03-14
+     */
+    public function ajaxNode() {
+        $id = I('post.id',0,'intval');
+        $params = array(
+            'title' => I('post.title','','trim'),
+            'update_time' => time(),
+        );
+
+        $oldvalue = I('post.oldtitle','','trim');
+        if($params['title'] == $oldvalue) {
+            $this->ajaxReturn(array(
+                'code' => 2000,
+                'data' => null,
+                'msg' => '节点信息修改成功～',
+            ));
         }
 
-        $this->assign('items',$nodes);
-        $this->display();
+        addLog("修改节点名称由“{$oldvalue}”改为“{$params['title']}”");
+        $model = new RbacModel();
+        if($model->updateNodeByNid($id,$params)) {
+            $this->ajaxReturn(array(
+                'code' => 2000,
+                'data' => null,
+                'msg' => '节点信息修改成功～',
+            ));
+        } else {
+            $this->ajaxReturn(array(
+                'code' => 50100,
+                'data' => null,
+                'msg' => '节点信息修改失败～',
+            ));
+        }
     }
 }

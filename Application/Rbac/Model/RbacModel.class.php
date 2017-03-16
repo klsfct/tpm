@@ -11,6 +11,7 @@ namespace Rbac\Model;
 
 
 use Think\Model;
+use Think\Page;
 
 class RbacModel extends Model
 {
@@ -18,18 +19,46 @@ class RbacModel extends Model
     protected $tableName = 'rbac_node';
 
     /**
-     * 查找全部节点
+     * @alias   查找节点
+     * @author  saive@cneli.com
+     * @date    2017-03-14
+     * @param $params
      * @return mixed
      */
-    public function findAllNodes() {
-        return $this->select();
+    public function findAllNodes($params)
+    {
+        $map = array();
+        if ($params['level'] != 999) {
+            $map['level'] = $params['level'];
+        }
+        $params['itemcount'] = $this->where($map)->count();
+        $page = new Page($params['itemcount'], $params['pagesize']);
+        $res['show'] = trim($page->show());
+        $res['items'] = $this->where($map)->limit($page->firstRow . ',', $page->listRows)->select();
+        return $res;
+    }
+
+    /**
+     * @alias   修改节点
+     * @author  saive@cneli.com
+     * @date    2017-03-14
+     * @param $nid
+     * @param $params
+     * @return bool
+     */
+    public function updateNodeByNid($nid,$params) {
+        $map = array(
+            'id' => $nid
+        );
+        return $this->where($map)->save($params);
     }
 
     /**
      * 查找分组
      * @return mixed
      */
-    public function findAllGroups() {
+    public function findAllGroups()
+    {
         return M('RbacGroup')->order('sort ASC')->select();
     }
 
@@ -40,9 +69,10 @@ class RbacModel extends Model
      * @date    2017-02-28
      * @author  saive@cneli.com
      */
-    public function findAllRoles($params = array()) {
+    public function findAllRoles($params = array())
+    {
         $map = array();
-        if(isset($params['state'])) {
+        if (isset($params['state'])) {
             $map['state'] = $params['state'];
         }
 
@@ -56,11 +86,12 @@ class RbacModel extends Model
      * @param string $title
      * @return mixed
      */
-    public function findRoleByTitle($title = '') {
+    public function findRoleByTitle($title = '')
+    {
         $map = array(
             'title' => $title
         );
-        
+
         return M('RbacRole')->where($map)->find();
     }
 
@@ -71,7 +102,8 @@ class RbacModel extends Model
      * @param array $role
      * @return mixed
      */
-    public function addRole($role = array()) {
+    public function addRole($role = array())
+    {
         $role['state'] = 1;
 
         return M('RbacRole')->add($role);
@@ -84,7 +116,8 @@ class RbacModel extends Model
      * @param int $id
      * @return mixed
      */
-    public function delRoleById($id = 0) {
+    public function delRoleById($id = 0)
+    {
         $map = array(
             'id' => $id
         );
@@ -100,7 +133,8 @@ class RbacModel extends Model
      * @param $params
      * @return bool
      */
-    public function changeRoleState($id,$params) {
+    public function changeRoleState($id, $params)
+    {
         $map = array(
             'id' => $id
         );
@@ -109,14 +143,15 @@ class RbacModel extends Model
     }
 
     /**
-     * @param array $groups   分组数据
+     * @param array $groups 分组数据
      * @param $params   删除条件
      * @return bool|string
      * @alias   重新添加分组
      * @date    2017-02-27
      * @author  saive@cneli.com
      */
-    public function reAddAllGroups($groups = array(),$params) {
+    public function reAddAllGroups($groups = array(), $params)
+    {
         $model = M('RbacGroup');
         $model->where('id > 0')->delete();
         return $model->addAll($groups);
@@ -130,12 +165,13 @@ class RbacModel extends Model
      * @param array $nodes
      * @return bool|string
      */
-    public function reAddAccess($roleId=0,$nodes=array()) {
+    public function reAddAccess($roleId = 0, $nodes = array())
+    {
         $model = M('RbacAccess');
-        $model->where(array('role_id'=>$roleId))->delete();
+        $model->where(array('role_id' => $roleId))->delete();
 
         $items = array();
-        foreach($nodes as $node) {
+        foreach ($nodes as $node) {
             $items[] = array(
                 'role_id' => $roleId,
                 'node_id' => $node
@@ -151,7 +187,8 @@ class RbacModel extends Model
      * @return bool|string
      * 先清空后添加【谨慎使用】
      */
-    public function reAddAllMenus($menus) {
+    public function reAddAllMenus($menus)
+    {
         $model = M('RbacMenu');
         $model->where('id > 0')->delete();
         return $model->addAll($menus);
@@ -164,16 +201,17 @@ class RbacModel extends Model
      * @param int $roleId
      * @return mixed
      */
-    public function findAllAccessByRoleId($roleId = 0) {
+    public function findAllAccessByRoleId($roleId = 0)
+    {
         $map = array(
             'role_id' => $roleId
         );
 
         $prex = C('DB_PREFIX');
         return M('RbacAccess')
-                ->where($map)
-                ->join("{$prex}rbac_node AS rn ON {$prex}rbac_access.node_id = rn.id",'left')
-                ->select();
+            ->where($map)
+            ->join("{$prex}rbac_node AS rn ON {$prex}rbac_access.node_id = rn.id", 'left')
+            ->select();
     }
 
 }

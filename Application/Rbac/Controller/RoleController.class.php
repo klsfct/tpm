@@ -29,7 +29,12 @@ class RoleController extends Controller
     {
         $model = new RbacModel();
         $items = $model->findAllRoles();
-        $_nodes = $model->findAllNodes();
+        $params = array(
+            'level' => 999,
+            'pagesize' => 9999,
+        );
+        $res = $model->findAllNodes($params);
+        $_nodes = $res['items'];
         $nodes = array();
         $map = array(
             0 => 'app',

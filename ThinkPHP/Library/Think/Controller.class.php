@@ -37,6 +37,12 @@ abstract class Controller {
      */
     protected $menus = array();
 
+    /**
+     * 分页数据
+     * @var int
+     */
+    protected $pagesize = 20;
+
    /**
      * 架构函数 取得模板对象实例
      * @access public
