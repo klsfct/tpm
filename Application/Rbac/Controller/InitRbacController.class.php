@@ -41,7 +41,7 @@ class InitRbacController extends Controller
     );
 
     /**
-     * @alias 初始化
+     * @alias 节点初始化
      */
     public function index ()
     {
