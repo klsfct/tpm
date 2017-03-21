@@ -4,5 +4,8 @@ Application/Common/Conf/database.php
 
 Application/Active
 Application/Notice
+Application/Loss
+Application/Statistics
 
 
+Application/Runtime/
