@@ -322,6 +322,38 @@ class InitRbacController extends Controller
         M()->execute("DELETE FROM `{$prex}rbac_node`");
         M()->execute($sql);
 
+        /* 导入导航 */
+        $sql = "
+            SELECT
+              rn.title,
+              rn.`key`,
+              rn2.title,
+              rn2.`key` AS ckey,
+              rn3.title,
+              rn3.`key` AS fkey,
+              rn.title AS title,
+              concat_ws('/',rn3.`key`,rn2.`key`,rn.`key`) AS href,
+              concat_ws('/',rn3.`key`,rn2.`key`,rn.`key`) AS alias
+            FROM {$prex}rbac_node rn LEFT JOIN {$prex}rbac_node rn2 ON rn.pid = rn2.id
+              LEFT JOIN {$prex}rbac_node rn3 ON rn2.pid = rn3.id
+            WHERE rn.level = 3 AND rn.state = 1 AND rn.is_ajax = 0 AND rn.is_menu = 1
+            ";
+        $items = M()->query($sql);
+        $groups = M('RbacGroup')->field('id,key')->select();
+        $gmap = array();
+        foreach($groups as $group) {
+            $gmap[$group['key']] = $group['id'];
+        }
+
+        foreach($items as $key=>$item) {
+            $items[$key]['gid'] = $gmap[$item['fkey']];
+            $items[$key]['sort'] = 0;
+            $items[$key]['node_unique_key'] = md5(strtolower($items[$key]['fkey'] . '_' . $items[$key]['ckey'] . '_' . $items[$key]['key']));
+            unset($items[$key]['ckey'],$items[$key]['fkey'],$items[$key]['key']);
+        }
+        M('RbacMenu')->delete();
+        M('RbacMenu')->addAll($items);
+
         $groups = array_keys($items);
         array_unique($groups);
 

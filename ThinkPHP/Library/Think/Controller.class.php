@@ -57,6 +57,7 @@ abstract class Controller {
 
         $requestName = strtolower(MODULE_NAME.CONTROLLER_NAME.ACTION_NAME);
         $this->menus = session('menus');
+
         if(empty($this->menus) && !empty(session('ucenter'))) {
             $this->_buildMenus();
         }
