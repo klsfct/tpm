@@ -56,17 +56,21 @@ session_start();
                 /* 创建所需数据库 */
                 mysqli_select_db($link,$data['db']['database']);
                 $sql = "CREATE TABLE `{$data['db']['prex']}admin_user` (
-                      `id` int(11) NOT NULL AUTO_INCREMENT,
-                      `username` varchar(50) NOT NULL,
-                      `password` varchar(50) NOT NULL,
-                      `name` varchar(50) NOT NULL,
-                      `role_id` int(11) NOT NULL DEFAULT '0',
-                      `salt` varchar(32) NOT NULL,
-                      `create_time` int(10) NOT NULL,
-                      `update_time` int(10) DEFAULT NULL,
-                      `state` int(2) NOT NULL DEFAULT '1',
-                      PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC";
+                          `id` int(11) NOT NULL AUTO_INCREMENT,
+                          `username` varchar(50) NOT NULL COMMENT '登录名',
+                          `password` varchar(50) NOT NULL COMMENT '密码',
+                          `name` varchar(50) NOT NULL COMMENT '名称',
+                          `role_id` int(11) NOT NULL DEFAULT '0' COMMENT '权限组',
+                          `salt` varchar(32) NOT NULL COMMENT '密码随机数',
+                          `create_time` int(10) NOT NULL COMMENT '创建时间',
+                          `update_time` int(10) DEFAULT NULL COMMENT '更新时间',
+                          `last_login_time` int(10) DEFAULT NULL COMMENT '最后一次登录时间',
+                          `last_login_ip` varchar(20) DEFAULT NULL COMMENT '最后一次登录IP',
+                          `email` varchar(200) DEFAULT NULL COMMENT '邮箱',
+                          `mobile` varchar(11) DEFAULT NULL COMMENT '手机',
+                          `state` int(2) NOT NULL DEFAULT '1',
+                          PRIMARY KEY (`id`)
+                        ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC";
                 mysqli_query($link,$sql);
                 $salt = rand(1000,9999);
                 $sql = "INSERT INTO {$data['db']['prex']}admin_user (username, password, name, role_id, state, salt, create_time, update_time) VALUES
@@ -123,12 +127,13 @@ session_start();
                 mysqli_query($link,$sql);
 
                 $sql = "CREATE TABLE `{$data['db']['prex']}rbac_group` (
-                      `id` int(11) NOT NULL AUTO_INCREMENT,
-                      `title` varchar(32) DEFAULT NULL,
-                      `key` varchar(32) DEFAULT NULL,
-                      `sort` int(5) DEFAULT NULL,
-                      PRIMARY KEY (`id`)
-                    ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `title` varchar(32) DEFAULT NULL,
+                  `key` varchar(32) DEFAULT NULL,
+                  `sort` int(5) DEFAULT NULL,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `{$data['db']['prex']}rbac_group_key_uindex` (`key`)
+                ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
                 mysqli_query($link,$sql);
 
 //                $sql = "CREATE TABLE `{$data['db']['prex']}rbac_menu` (

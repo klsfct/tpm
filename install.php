@@ -127,12 +127,13 @@ session_start();
                 mysqli_query($link,$sql);
 
                 $sql = "CREATE TABLE `{$data['db']['prex']}rbac_group` (
-                      `id` int(11) NOT NULL AUTO_INCREMENT,
-                      `title` varchar(32) DEFAULT NULL,
-                      `key` varchar(32) DEFAULT NULL,
-                      `sort` int(5) DEFAULT NULL,
-                      PRIMARY KEY (`id`)
-                    ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `title` varchar(32) DEFAULT NULL,
+                  `key` varchar(32) DEFAULT NULL,
+                  `sort` int(5) DEFAULT NULL,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `{$data['db']['prex']}rbac_group_key_uindex` (`key`)
+                ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
                 mysqli_query($link,$sql);
 
 //                $sql = "CREATE TABLE `{$data['db']['prex']}rbac_menu` (

@@ -211,12 +211,20 @@ class InitRbacController extends Controller
                     ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8";
             M()->execute($accessSql);
 
+//            $groupSql = "CREATE TABLE `{$prex}rbac_group` (
+//                  `id` int(11) NOT NULL AUTO_INCREMENT,
+//                  `title` varchar(32) DEFAULT NULL,
+//                  `key` varchar(32) DEFAULT NULL,
+//                  PRIMARY KEY (`id`)
+//                ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
             $groupSql = "CREATE TABLE `{$prex}rbac_group` (
-                  `id` int(11) NOT NULL AUTO_INCREMENT,
-                  `title` varchar(32) DEFAULT NULL,
-                  `key` varchar(32) DEFAULT NULL,
-                  PRIMARY KEY (`id`)
-                ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `title` varchar(32) DEFAULT NULL,
+              `key` varchar(32) DEFAULT NULL,
+              `sort` int(5) DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY `{$prex}rbac_group_key_uindex` (`key`)
+            ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='角色权限分组'";
             M()->execute($groupSql);
 
             M('RbacGroup')->add(array(
@@ -266,6 +274,7 @@ class InitRbacController extends Controller
 
         );
         $i = 2;
+        $groups = array();
         foreach($items as $key=>$item) {
             $pid = $i;  //分组id，控制器的pid
             /* 分组 */
@@ -280,6 +289,7 @@ class InitRbacController extends Controller
                 'unique_key' => md5(strtolower($key)),
                 'is_menu' => 1,
             );
+            $groups[] = $key;
             $i++;
             /* 控制器 */
             foreach($item as $_key => $_item) {
@@ -312,6 +322,16 @@ class InitRbacController extends Controller
                 }
             }
         }
+
+
+        $data = array();
+        $sql = "INSERT INTO {$prex}rbac_group (title, `key`, sort) VALUES ";
+        foreach($groups as $group) {
+            $data[] = "('{$group}','{$group}',1)";
+        }
+        $sql .= implode(',',$data). ' ON DUPLICATE KEY UPDATE `key` = `key`';
+
+        M('RbacGroup')->execute($sql);
         $time = time();
         $sql = "INSERT INTO `{$prex}rbac_node` (`id`,`title`,`key`,`level`,`state`,`pid`,`is_ajax`,create_time,update_time,unique_key,is_menu) VALUES ";
         foreach($values as $value) {
@@ -344,9 +364,8 @@ class InitRbacController extends Controller
         foreach($groups as $group) {
             $gmap[$group['key']] = $group['id'];
         }
-
         foreach($items as $key=>$item) {
-            $items[$key]['gid'] = $gmap[$item['fkey']];
+            $items[$key]['gid'] = $gmap[$item['fkey']] ? :$item['fkey'];
             $items[$key]['sort'] = 0;
             $items[$key]['node_unique_key'] = md5(strtolower($items[$key]['fkey'] . '_' . $items[$key]['ckey'] . '_' . $items[$key]['key']));
             unset($items[$key]['ckey'],$items[$key]['fkey'],$items[$key]['key']);
@@ -356,17 +375,6 @@ class InitRbacController extends Controller
 
         $groups = array_keys($items);
         array_unique($groups);
-
-        $data = array();
-        foreach($groups as $group) {
-            $data[] = array(
-                'title' => $group,
-                'key'   => $group,
-                'sort'  => 1
-            );
-        }
-        M('RbacGroup')->addAll($data);
-
         $nodes = M('RbacNode')->field('id')->select();
         $access = array();
         foreach($nodes as $node) {
